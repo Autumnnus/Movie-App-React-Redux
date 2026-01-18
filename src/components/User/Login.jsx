@@ -1,18 +1,14 @@
-import { useDispatch, useSelector } from "react-redux";
-import {
-  findUserLogin,
-  toggleLoginMode,
-  toggleLoginSuccessful,
-} from "../../redux/userSlice";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { FiChevronRight, FiLock, FiMail } from "react-icons/fi";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { createLocalToken, setUserID } from "../../redux/authSlice";
+import { toggleLoginMode, toggleLoginSuccessful } from "../../redux/userSlice";
 
 const Login = () => {
   const { loginSuccessful } = useSelector((state) => state.user);
-  const user = useSelector((state) => state.user);
+  const { user: allUsers } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [loginInfo, setLoginInfo] = useState({
@@ -25,41 +21,24 @@ const Login = () => {
   };
 
   const generateJwtToken = () => {
-    const uniqueID = uuidv4();
-    const jwtToken = uniqueID.replace(/-/g, "");
-    //const expirationTime = new Date().getTime() + 12 * 60 * 60 * 1000; // 12 saat
-    //
-    //console.log("TOKEN DATA: ", tokenData);
-    // localStorage.setItem("jwtToken", JSON.stringify(tokenData));
-    localStorage.setItem("jwtToken", jwtToken);
+    const jwtToken = uuidv4().replace(/-/g, "");
     return jwtToken;
   };
-  const loginFunc = async () => {
-    try {
-      await axios.get("http://localhost:3000/users", { ...loginInfo });
-      const loginChechk = user.user.find((dt) => {
-        return (
-          loginInfo.email === dt.email && loginInfo.password === dt.password
-        );
-      });
-      if (loginChechk) {
-        dispatch(findUserLogin(loginInfo));
-        // navigate(`/users/${loginChechk.id}`);
-        navigate(`/`);
-        const jwtToken = generateJwtToken();
-        dispatch(createLocalToken(jwtToken));
-        dispatch(setUserID(loginChechk.id));
-        window.location.reload();
-        try {
-          await axios.get(`http://localhost:3000/users/${loginChechk.id}`, {});
-        } catch (error) {
-          console.error("Error adding product:", error);
-        }
-      } else {
-        console.error("Invalid email or password");
-      }
-    } catch (error) {
-      console.error("Error adding product:", error);
+
+  const loginFunc = () => {
+    const loginCheck = allUsers.find((dt) => {
+      return loginInfo.email === dt.email && loginInfo.password === dt.password;
+    });
+
+    if (loginCheck) {
+      const jwtToken = generateJwtToken();
+      dispatch(createLocalToken(jwtToken));
+      dispatch(setUserID(loginCheck.id));
+      dispatch(toggleLoginSuccessful());
+      navigate(`/`);
+      window.location.reload();
+    } else {
+      alert("Invalid email or password");
     }
   };
 
@@ -72,48 +51,69 @@ const Login = () => {
     if (loginSuccessful) {
       dispatch(toggleLoginSuccessful());
     }
-  }, [loginSuccessful, navigate, dispatch]);
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded shadow-md w-96">
-        <h2 className="text-2xl font-semibold mb-4">Login</h2>
+  }, [loginSuccessful, dispatch]);
 
-        <div className="mb-4">
-          <label htmlFor="email" className="block text-gray-600">
-            E-mail:
-          </label>
-          <input
-            type="email"
-            id="email"
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
-            placeholder="Enter your E-mail"
-            onChange={(e) => onchangeFunc(e)}
-          />
+  return (
+    <div className="min-h-[calc(100vh-80px)] flex items-center justify-center bg-[#050404]">
+      <div className="bg-[#2e1c2b] p-10 border border-[#893168]/20 rounded-xl w-full max-w-md shadow-2xl">
+        <div className="flex flex-col items-center mb-8">
+          <div className="w-16 h-1 w-[2px] bg-[#893168] mb-4" />
+          <h2 className="text-3xl font-black text-white tracking-tighter">
+            Welcome Back
+          </h2>
+          <p className="text-gray-500 text-sm mt-1">
+            Sign in to your CineStream account
+          </p>
         </div>
-        <div className="mb-4">
-          <label htmlFor="password" className="block text-gray-600">
-            Password:
-          </label>
-          <input
-            type="password"
-            id="password"
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
-            placeholder="Enter Your Password"
-            onChange={(e) => onchangeFunc(e)}
-          />
-        </div>
-        <div>
+
+        <div className="space-y-6">
+          <div className="flex flex-col gap-2">
+            <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1 flex items-center gap-2">
+              <FiMail /> E-mail Address
+            </label>
+            <input
+              type="email"
+              id="email"
+              className="input-field"
+              placeholder="name@example.com"
+              onChange={onchangeFunc}
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1 flex items-center gap-2">
+              <FiLock /> Security Password
+            </label>
+            <input
+              type="password"
+              id="password"
+              className="input-field"
+              placeholder="••••••••"
+              onChange={onchangeFunc}
+            />
+          </div>
+
           <button
-            className="w-full bg-rose-800 text-white py-2 rounded-lg hover:bg-rose-950 transition duration-300 mb-4"
+            className="btn-primary w-full py-3.5 mt-4 shadow-[0_8px_24px_-4px_rgba(137,49,104,0.4)] group"
             onClick={loginFunc}
           >
-            Login
+            Authenticate
+            <FiChevronRight className="group-hover:translate-x-1 transition-transform" />
           </button>
+
+          <div className="flex items-center gap-4 my-8">
+            <div className="h-[1px] bg-white/5 flex-1" />
+            <span className="text-[10px] font-black text-gray-600 uppercase tracking-widest">
+              or
+            </span>
+            <div className="h-[1px] bg-white/5 flex-1" />
+          </div>
+
           <button
-            className="w-full bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-300 transition duration-300"
+            className="w-full text-gray-400 hover:text-white text-sm font-bold transition-colors flex items-center justify-center gap-2"
             onClick={toggleLoginModeFunc}
           >
-            Sign Up
+            Create New Account
           </button>
         </div>
       </div>

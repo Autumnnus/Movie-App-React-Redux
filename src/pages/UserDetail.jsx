@@ -1,45 +1,27 @@
-import { useDispatch, useSelector } from "react-redux";
-import Header from "../components/Navbar/Header";
-import UserProfile from "../components/User/Auth/UserProfile";
-import { useEffect, useState } from "react";
-import { integrateUsersFromServer } from "../redux/userSlice";
-import InvalidPage from "../components/User/Auth/InvalidPage";
+import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
+import Header from "../components/Navbar/Header";
+import InvalidPage from "../components/User/Auth/InvalidPage";
+import UserProfile from "../components/User/Auth/UserProfile";
 
 const UserDetail = () => {
-  const dispatch = useDispatch();
-  // eslint-disable-next-line no-unused-vars
-  const [userData, setUserData] = useState();
   const auth = useSelector((state) => state.auth);
-  const user = useSelector((state) => state.user || []);
-  const fetchUserData = () => {
-    const baseURL = "http://localhost:3000/users";
-    fetch(baseURL)
-      .then((response) => response.json())
-      .then((data) => {
-        setUserData(data);
-        dispatch(integrateUsersFromServer(data));
-      })
-      .catch((error) => {
-        console.error("Fetch error:", error);
-      });
-  };
-  const matchedUserID = user.user.find((dt) => {
-    return dt.id == auth.userID;
-  });
+  const { user: allUsers } = useSelector((state) => state.user);
+
   const location = useLocation();
   let loc = location.pathname.split("/")[2];
 
-  useEffect(() => {
-    fetchUserData();
-  }, []);
+  const matchedUser = allUsers.find(
+    (dt) => dt.id.toString() === auth.userID?.toString(),
+  );
+
   return (
-    <div>
-      <Header></Header>
-      {auth.userID === loc && auth.token ? (
-        <UserProfile matchedUserID={matchedUserID}></UserProfile>
+    <div className="min-h-screen bg-[#050404]">
+      <Header />
+      {auth.userID?.toString() === loc?.toString() && auth.token ? (
+        <UserProfile matchedUserID={matchedUser} />
       ) : (
-        <InvalidPage></InvalidPage>
+        <InvalidPage />
       )}
     </div>
   );

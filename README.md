@@ -1,17 +1,57 @@
-# React + Vite
+# CineStream - Cinematic Catalog Management
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, high-performance movie management interface built with **React**, **Redux Toolkit**, and **Tailwind CSS**. **CineStream** provides a premium experience for movie enthusiasts to manage and explore cinematic titles with a custom-crafted visual identity.
 
-Currently, two official plugins are available:
+## 🎨 Design Philosophy
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+**CineStream** follows a "Cinematic Dark" aesthetic, intentionally designed to feel premium and professional:
 
-# Usage
+- **Color Palette**: Sophisticated deep plum and obsidian charcoal (`#893168`, `#2E1C2B`, `#050404`).
+- **Typography**: Powered by **Outfit** for a sleek, modern, and readable atmosphere.
+- **Experience**: Stable, robust layouts with intentional micro-interactions, avoiding typical template-like behavior.
 
-1. Open the terminal and enter the command `npx json-server --watch src/api/db.json` first. It will fetch data from the json-server.
-2. Then, run the command `npm run start`. Now you can use the movie-app.
+## 🚀 Key Features
 
-# Description
+- **Cinematic Dashboard**: High-quality movie cards featuring dynamic hover effects and play interactions.
+- **Rich Detail Views**: Comprehensive movie details including director information, synopsis, data visuals, and trailer links.
+- **State Orchestration**: Powered by **Redux Toolkit** managing `product`, `auth`, and `modal` states.
+- **Full Movie CRUD**: Intuitive interface to list, edit, and manage cinematic titles.
+- **Cinematic Search & Sort**: Efficient tools to navigate through the curated collection.
+- **Responsive Layout**: Designed to provide an excellent experience across all device sizes.
 
-This is an example React-Redux project by me. I didn't focus on CSS, so it might not look great, but I have learned a lot of React-related concepts with this project, such as Hooks, Redux, Axios, and more.
+## 🛠 Tech Stack
+
+- **Frontend Framework**: React 18
+- **State Management**: Redux Toolkit
+- **Navigation**: React Router DOM v6
+- **Styling**: Tailwind CSS (Custom design system implementation)
+- **Icons**: React Icons (Fi, Bi, Ai)
+- **API Communication**: Axios & Fetch API
+
+## 📦 Project Structure
+
+- `/src/components`: UI architecture including `Navbar`, `Products`, and shared atoms.
+- `/src/pages`: Top-level application routes (`Home`, `ProductDetail`).
+- `/src/redux`: Centralized state management slices and store configuration.
+- `/src/index.css`: Core design system and global utility definitions.
+
+## 🚀 Getting Started
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone [repository-url]
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Run the development server:
+   ```bash
+   npm run dev
+   ```
+
+---
+
+_Elevating the cinematic management experience._

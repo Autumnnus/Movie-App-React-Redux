@@ -1,8 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  token: localStorage.getItem("jwtToken") || "",
-  userID: localStorage.getItem("userID") || "",
+  token: localStorage.getItem("jwtToken") || null,
+  userID: localStorage.getItem("userID") || null,
 };
 
 const authSlice = createSlice({
@@ -11,17 +11,21 @@ const authSlice = createSlice({
   reducers: {
     createLocalToken: (state, action) => {
       state.token = action.payload;
+      localStorage.setItem("jwtToken", action.payload);
+    },
+    setUserID: (state, action) => {
+      state.userID = action.payload;
+      localStorage.setItem("userID", action.payload);
     },
     signOut: (state) => {
       state.token = null;
       state.userID = null;
-    },
-    setUserID: (state, action) => {
-      localStorage.setItem("userID", action.payload);
+      localStorage.removeItem("jwtToken");
+      localStorage.removeItem("userID");
     },
   },
 });
 
-export const { createLocalToken, signOut, setUserID } = authSlice.actions;
+export const { createLocalToken, setUserID, signOut } = authSlice.actions;
 
 export default authSlice.reducer;

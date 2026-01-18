@@ -1,19 +1,14 @@
+import { useEffect, useState } from "react";
 import { IoIosClose } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
-import { modalFunc } from "../../redux/modalSlice";
-import { useEffect, useState } from "react";
-import { createProductFunc, updateProductFunc } from "../../redux/productSlice";
-import axios from "axios";
-import PropTypes from "prop-types";
 import { useLocation, useNavigate } from "react-router-dom";
+import { modalFunc } from "../../redux/modalSlice";
+import { createProductFunc, updateProductFunc } from "../../redux/productSlice";
 
-const Modal = ({ fetchDataFromServer }) => {
-  Modal.propTypes = {
-    fetchDataFromServer: PropTypes.func.isRequired,
-  };
+const Modal = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { product } = useSelector((state) => state.product || []);
+  const { product } = useSelector((state) => state.product);
   const [movieInfo, setMovieInfo] = useState({
     name: "",
     category: "",
@@ -29,30 +24,20 @@ const Modal = ({ fetchDataFromServer }) => {
 
   const location = useLocation();
   let loc = location?.search.split("=")[1];
+
   useEffect(() => {
     if (loc) {
-      const foundProduct = product.find((pr) => pr.id == loc);
+      const foundProduct = product.find(
+        (pr) => pr.id.toString() === loc.toString(),
+      );
       if (foundProduct) {
         setMovieInfo(foundProduct);
-      } else {
-        setMovieInfo({
-          name: "",
-          category: "",
-          description: "",
-          url: "",
-          director: "",
-          imdbRating: "",
-          date: "",
-          duration: "",
-          trailerUrl: "",
-          id: "",
-        });
       }
     }
-  }, [loc]);
+  }, [loc, product]);
 
   const onchangeFunc = (e, type) => {
-    if (type == "url") {
+    if (type === "url") {
       setMovieInfo((prev) => ({
         ...prev,
         [e.target.name]: URL.createObjectURL(e.target.files[0]),
@@ -62,28 +47,18 @@ const Modal = ({ fetchDataFromServer }) => {
     }
   };
 
-  const buttonFunc = async () => {
+  const buttonFunc = () => {
     if (loc) {
-      try {
-        await axios.put(`http://localhost:3000/movies/${loc}`, {
-          ...movieInfo,
-        });
-        dispatch(updateProductFunc({ ...movieInfo, id: loc }));
-        dispatch(modalFunc());
-        fetchDataFromServer();
-      } catch (error) {
-        console.error("Error adding product:", error);
-      }
+      dispatch(updateProductFunc({ ...movieInfo, id: loc }));
     } else {
-      try {
-        await axios.post("http://localhost:3000/movies", { ...movieInfo });
-        dispatch(createProductFunc({ ...movieInfo, id: product.length + 1 }));
-        dispatch(modalFunc());
-        fetchDataFromServer(); // Call the callback function
-      } catch (error) {
-        console.error("Error adding product:", error);
-      }
+      const newId =
+        product.length > 0
+          ? (Math.max(...product.map((p) => parseInt(p.id))) + 1).toString()
+          : "1";
+      dispatch(createProductFunc({ ...movieInfo, id: newId }));
     }
+    dispatch(modalFunc());
+    navigate("/");
   };
 
   const closeModal = () => {
@@ -92,103 +67,144 @@ const Modal = ({ fetchDataFromServer }) => {
   };
 
   return (
-    <>
-      <div className="fixed top-0 left-0 right-0 bottom-0 w-full h-screen flex items-center justify-center">
-        <div className="w-1/3 bg-white shadow-lg rounded-md p-4">
-          <div className="border-b py-3 flex items-center justify-between">
-            <div className="text-2xl">Add New Movie</div>
-            <IoIosClose
-              className="cursor-pointer"
-              size={24}
-              onClick={closeModal}
-            ></IoIosClose>
-          </div>
-          <input
-            className="h-10 w-full border rounded-md p-2 outline-none mt-3"
-            value={movieInfo.name}
-            type="text"
-            placeholder="Movie Name"
-            name="name"
-            id="name"
-            onChange={(e) => onchangeFunc(e, "name")}
-          />
-          <input
-            className="h-10 w-full border rounded-md p-2 outline-none mt-3"
-            value={movieInfo.category}
-            type="text"
-            placeholder="Category"
-            name="category"
-            id="category"
-            onChange={(e) => onchangeFunc(e, "category")}
-          />
-          <input
-            className="h-10 w-full border rounded-md p-2 outline-none mt-3"
-            value={movieInfo.description}
-            type="text"
-            placeholder="Description"
-            name="description"
-            id="description"
-            onChange={(e) => onchangeFunc(e, "description")}
-          />
-          <input
-            className="h-10 w-full border rounded-md p-2 outline-none mt-3"
-            value={movieInfo.director}
-            type="text"
-            placeholder="Director"
-            name="director"
-            id="director"
-            onChange={(e) => onchangeFunc(e, "director")}
-          />
-          <input
-            className="h-10 w-full border rounded-md p-1 outline-none mt-3"
-            type="text"
-            placeholder="IMDB Rating"
-            name="imdbRating"
-            id="imdbRating"
-            onChange={(e) => onchangeFunc(e, "imdbRating")}
-          />
-          <input
-            className="h-10 w-full border rounded-md p-1 outline-none mt-3"
-            type="text"
-            placeholder="Release Date"
-            name="date"
-            id="date"
-            onChange={(e) => onchangeFunc(e, "date")}
-          />
-          <input
-            className="h-10 w-full border rounded-md p-1 outline-none mt-3"
-            type="text"
-            placeholder="Duration"
-            name="duration"
-            id="duration"
-            onChange={(e) => onchangeFunc(e, "duration")}
-          />
-          <input
-            className="h-10 w-full border rounded-md p-1 outline-none mt-3"
-            type="text"
-            placeholder="Trailer Url"
-            name="trailerUrl"
-            id="trailerUrl"
-            onChange={(e) => onchangeFunc(e, "trailerUrl")}
-          />
-          <input
-            className="h-10 w-full border rounded-md p-1 outline-none mt-3"
-            type="file"
-            placeholder="Image"
-            name="url"
-            id="url"
-            onChange={(e) => onchangeFunc(e, "url")}
-          />
-
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 overflow-y-auto">
+      <div
+        className="fixed inset-0 bg-[#050404]/90 backdrop-blur-sm"
+        onClick={closeModal}
+      />
+      <div className="relative w-full max-w-2xl bg-[#2e1c2b] border border-[#893168]/20 rounded-xl p-8 shadow-2xl my-auto">
+        <div className="flex items-center justify-between mb-8 border-b border-white/5 pb-4">
+          <h2 className="text-2xl font-black text-white tracking-tight">
+            {loc ? "Edit Cinematic Title" : "Launch New Masterpiece"}
+          </h2>
           <button
-            className="w-full h-10 bg-indigo-600 text-white flex items-center justify-center mt-2 rounded-md border-none"
-            onClick={buttonFunc}
+            onClick={closeModal}
+            className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-white/5 text-gray-500 hover:text-white transition-colors"
           >
-            Submit
+            <IoIosClose size={36} />
           </button>
         </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="space-y-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">
+                Title
+              </label>
+              <input
+                className="input-field"
+                value={movieInfo.name}
+                type="text"
+                placeholder="e.g. Inception"
+                name="name"
+                onChange={(e) => onchangeFunc(e, "name")}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">
+                Category
+              </label>
+              <input
+                className="input-field"
+                value={movieInfo.category}
+                type="text"
+                placeholder="e.g. Sci-Fi"
+                name="category"
+                onChange={(e) => onchangeFunc(e, "category")}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">
+                  Year
+                </label>
+                <input
+                  className="input-field"
+                  value={movieInfo.date}
+                  type="text"
+                  placeholder="2024"
+                  name="date"
+                  onChange={(e) => onchangeFunc(e, "date")}
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">
+                  Rating
+                </label>
+                <input
+                  className="input-field"
+                  value={movieInfo.imdbRating}
+                  type="text"
+                  placeholder="8.5"
+                  name="imdbRating"
+                  onChange={(e) => onchangeFunc(e, "imdbRating")}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">
+                Director
+              </label>
+              <input
+                className="input-field"
+                value={movieInfo.director}
+                type="text"
+                placeholder="Christopher Nolan"
+                name="director"
+                onChange={(e) => onchangeFunc(e, "director")}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">
+                Trailer URL
+              </label>
+              <input
+                className="input-field"
+                value={movieInfo.trailerUrl}
+                type="text"
+                placeholder="https://youtube.com/..."
+                name="trailerUrl"
+                onChange={(e) => onchangeFunc(e, "trailerUrl")}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">
+                Poster Image
+              </label>
+              <input
+                className="input-field bg-transparent border-dashed border-2 border-white/10"
+                type="file"
+                name="url"
+                onChange={(e) => onchangeFunc(e, "url")}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-5 flex flex-col gap-1.5">
+          <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">
+            Synopsis
+          </label>
+          <textarea
+            className="input-field min-h-[100px] resize-none"
+            value={movieInfo.description}
+            placeholder="Write a brief summary of the movie..."
+            name="description"
+            onChange={(e) => onchangeFunc(e, "description")}
+          />
+        </div>
+
+        <button
+          className="btn-primary w-full mt-8 shadow-[0_8px_24px_-4px_rgba(137,49,104,0.4)]"
+          onClick={buttonFunc}
+        >
+          {loc ? "Commit Changes" : "Launch Title"}
+        </button>
       </div>
-    </>
+    </div>
   );
 };
 

@@ -1,93 +1,98 @@
-import { useDispatch, useSelector } from "react-redux";
-import {
-  createNewAccount,
-  findUserSignUp,
-  toggleLoginMode,
-  toggleSignupSuccessful,
-} from "../../redux/userSlice";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { FiChevronLeft, FiLock, FiMail, FiUser } from "react-icons/fi";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { registerUserFunc, toggleLoginMode } from "../../redux/userSlice";
 
 const SignUp = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const user = useSelector((state) => state.user || []);
-  const { signupSuccessful } = useSelector((state) => state.user);
-  const [signupInfo, setSignupInfo] = useState({
+  const [signUpInfo, setSignUpInfo] = useState({
+    username: "",
     email: "",
     password: "",
-    role: "user",
   });
+
   const onchangeFunc = (e) => {
-    setSignupInfo((prev) => ({ ...prev, [e.target.id]: e.target.value }));
+    setSignUpInfo((prev) => ({ ...prev, [e.target.id]: e.target.value }));
   };
-  const signUpFunc = async () => {
-    try {
-      await axios.get("http://localhost:3000/users", { ...signupInfo });
-      try {
-        dispatch(findUserSignUp(signupInfo));
-        await axios.post("http://localhost:3000/users", { ...signupInfo });
-        // dispatch(createNewAccount({ id: user.length + 1 }));
-        dispatch(createNewAccount({ ...signupInfo, id: user.length + 1 }));
-      } catch (error) {
-        console.error("Error signing up:", error.message);
-      }
-    } catch (error) {
-      console.error("Error signing up:", error);
+
+  const signUpFunc = () => {
+    if (signUpInfo.username && signUpInfo.email && signUpInfo.password) {
+      dispatch(registerUserFunc(signUpInfo));
+      dispatch(toggleLoginMode());
+      navigate("/users?login");
     }
   };
-  const toggleLoginModeFunc = () => {
-    dispatch(toggleLoginMode());
-    navigate("/users?login");
-  };
-  useEffect(() => {
-    if (signupSuccessful) {
-      navigate("/");
-      dispatch(toggleSignupSuccessful());
-    }
-  }, [signupSuccessful, navigate, dispatch]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded shadow-md w-96">
-        <h2 className="text-2xl font-semibold mb-4">Signup</h2>
-        <div className="mb-4">
-          <label htmlFor="email" className="block text-gray-600">
-            E-mail:
-          </label>
-          <input
-            type="email"
-            id="email"
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
-            placeholder="Enter your E-mail"
-            onChange={onchangeFunc}
-          />
+    <div className="min-h-[calc(100vh-80px)] flex items-center justify-center bg-[#050404]">
+      <div className="bg-[#2e1c2b] p-10 border border-[#893168]/20 rounded-xl w-full max-w-md shadow-2xl">
+        <div className="flex flex-col items-center mb-8">
+          <div className="w-16 h-1 w-[2px] bg-[#893168] mb-4" />
+          <h2 className="text-3xl font-black text-white tracking-tighter">
+            Join the Stream
+          </h2>
+          <p className="text-gray-500 text-sm mt-1">
+            Create your professional movie profile
+          </p>
         </div>
-        <div className="mb-4">
-          <label htmlFor="password" className="block text-gray-600">
-            Password:
-          </label>
-          <input
-            type="password"
-            id="password"
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
-            placeholder="Create a Password"
-            onChange={onchangeFunc}
-          />
-        </div>
-        <div>
+
+        <div className="space-y-6">
+          <div className="flex flex-col gap-2">
+            <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1 flex items-center gap-2">
+              <FiUser /> Full Identity
+            </label>
+            <input
+              type="text"
+              id="username"
+              className="input-field"
+              placeholder="John Wick"
+              onChange={onchangeFunc}
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1 flex items-center gap-2">
+              <FiMail /> E-mail Address
+            </label>
+            <input
+              type="email"
+              id="email"
+              className="input-field"
+              placeholder="name@stream.com"
+              onChange={onchangeFunc}
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1 flex items-center gap-2">
+              <FiLock /> Secure Password
+            </label>
+            <input
+              type="password"
+              id="password"
+              className="input-field"
+              placeholder="••••••••"
+              onChange={onchangeFunc}
+            />
+          </div>
+
           <button
-            className="w-full bg-rose-800 text-white py-2 rounded-lg hover:bg-rose-950 transition duration-300 mb-4"
+            className="btn-primary w-full py-3.5 mt-4 shadow-[0_8px_24px_-4px_rgba(137,49,104,0.4)]"
             onClick={signUpFunc}
           >
-            Sign Up
+            Create Account
           </button>
+
           <button
-            className="w-full bg-gray-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-300"
-            onClick={toggleLoginModeFunc}
+            className="w-full text-gray-400 hover:text-white text-sm font-bold transition-colors flex items-center justify-center gap-2 mt-4"
+            onClick={() => {
+              dispatch(toggleLoginMode());
+              navigate("/users?login");
+            }}
           >
-            Login
+            <FiChevronLeft /> Return to Sign In
           </button>
         </div>
       </div>

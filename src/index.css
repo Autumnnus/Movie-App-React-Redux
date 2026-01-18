@@ -1,3 +1,71 @@
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --primary: #893168;
+  --primary-hover: #4a1942;
+  --bg-dark: #050404;
+  --bg-surface: #2e1c2b;
+  --text-main: #eaeaea;
+  --text-muted: #a3a3a3;
+  --border: rgba(137, 49, 104, 0.2);
+}
+
+body {
+  margin: 0;
+  font-family: "Outfit", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  min-height: 100vh;
+}
+
+@layer components {
+  .card-surface {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    transition: all 0.2s ease;
+  }
+
+  .card-surface:hover {
+    border-color: var(--primary);
+    box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.5);
+  }
+
+  .input-field {
+    @apply w-full bg-[#0d0d0d] border border-white/10 rounded-lg px-4 py-2.5 text-white outline-none transition-all duration-200;
+  }
+
+  .input-field:focus {
+    @apply border-[#893168]/60 ring-1 ring-[#893168]/20 bg-[#121212];
+  }
+
+  .btn-primary {
+    @apply px-6 py-2.5 bg-[#893168] hover:bg-[#4a1942] text-white font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-outline {
+    @apply px-4 py-2 border border-white/10 hover:border-[#893168]/40 hover:bg-white/5 text-white font-medium rounded-lg transition-all duration-200;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bg-surface);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}

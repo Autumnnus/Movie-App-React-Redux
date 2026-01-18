@@ -1,19 +1,30 @@
+import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import Header from "../components/Navbar/Header";
-import { useSelector } from "react-redux";
 import Detail from "../components/Products/Detail";
 
 const ProductDetail = () => {
   const { id } = useParams();
   const { product } = useSelector((state) => state.product);
-  const foundProduct = product.find((item) => item.id == id);
+  const foundProduct = product.find(
+    (item) => item.id.toString() === id.toString(),
+  );
+
   if (!foundProduct) {
-    return <p>There is no product with this id (developer error).</p>;
+    return (
+      <div className="min-h-screen bg-[#050404]">
+        <Header />
+        <div className="flex flex-col items-center justify-center py-40">
+          <h2 className="text-2xl font-bold text-gray-500">Movie not found.</h2>
+        </div>
+      </div>
+    );
   }
+
   return (
-    <div>
-      <Header></Header>
-      <Detail product={product}></Detail>
+    <div className="min-h-screen bg-[#050404]">
+      <Header />
+      <Detail pr={foundProduct} />
     </div>
   );
 };
